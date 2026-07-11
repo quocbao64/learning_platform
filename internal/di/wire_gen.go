@@ -31,9 +31,11 @@ func Initialize() (*Container, error) {
 	authService := services.NewAuthService(userRepository, manager)
 	userService := services.NewUserService(userRepository)
 	authHandler := handlers.NewAuthHandler(authService, userService)
+	userHandler := handlers.NewUserHandler(userService)
 	container := &Container{
 		AuthHandler: authHandler,
 		JWTManager:  manager,
+		UserHandler: userHandler,
 	}
 	return container, nil
 }

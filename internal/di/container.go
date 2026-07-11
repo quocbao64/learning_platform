@@ -11,6 +11,7 @@ import (
 type Container struct {
 	AuthHandler *handlers.AuthHandler
 	JWTManager  *jwt.Manager
+	UserHandler *handlers.UserHandler
 }
 
 func (c *Container) SetupRouter() *gin.Engine {
@@ -18,6 +19,7 @@ func (c *Container) SetupRouter() *gin.Engine {
 	api := r.Group("/api/v1")
 	authMiddleware := middleware.Auth(c.JWTManager)
 	c.AuthHandler.RegisterRoutes(api, authMiddleware)
+	c.UserHandler.RegisterRoutes(api, authMiddleware)
 
 	return r
 }

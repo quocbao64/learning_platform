@@ -52,7 +52,7 @@ func (r *userRepository) Create(ctx context.Context, user *models.User) error {
 func (r *userRepository) GetByID(ctx context.Context, id int64) (*models.User, error) {
 	user := &models.User{}
 	err := r.db.QueryRow(ctx,
-		`SELECT id, email, password FROM users WHERE id = $1`, id,
+		`SELECT id, email, roles, full_name FROM users WHERE id = $1`, id,
 	).Scan(&user.ID, &user.Email, &user.Roles, &user.FullName)
 
 	if errors.Is(err, pgx.ErrNoRows) {

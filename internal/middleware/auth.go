@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const CtxUserID = "userID"
+const CtxUserID = "user_id"
 
-func UserID(c *gin.Context) string {
-	return c.GetString(CtxUserID)
+func UserID(c *gin.Context) int64 {
+	return c.GetInt64(CtxUserID)
 }
 
 func Auth(jwtManager *jwt.Manager) gin.HandlerFunc {

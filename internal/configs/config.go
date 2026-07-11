@@ -22,8 +22,8 @@ type AppConfig struct {
 }
 
 type JWTConfig struct {
-	Secret     string `mapstructure:"SECRET"`
-	TTLMinutes int    `mapstructure:"TTL_MINUTES"`
+	Secret     string `mapstructure:"JWT_SECRET"`
+	TTLMinutes int    `mapstructure:"JWT_TTL_MINUTES"`
 }
 
 func LoadConfig() (*Config, error) {
