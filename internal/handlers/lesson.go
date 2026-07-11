@@ -4,6 +4,7 @@ import (
 	"learning-platform/internal/models"
 	"learning-platform/internal/services"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -20,17 +21,11 @@ func NewLessonHandler(lessonService services.LessonService) *LessonHandler {
 }
 
 func (h *LessonHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc) {
-	lessonGroup := r.Group("/lessons")
+	lessonGroup := r.Group("/courses/:course_id/lessons")
 	{
 		lessonGroup.GET("", authMW, h.list)
 		lessonGroup.POST("", authMW, h.create)
 	}
-}
-
-type lessonRequestFilter struct {
-	PageID   int   `form:"page_id"`
-	PerPage  int   `form:"per_page"`
-	CourseID int64 `form:"course_id" binding:"required"`
 }
 
 type lessonRequest struct {
@@ -41,16 +36,14 @@ type lessonRequest struct {
 }
 
 func (h *LessonHandler) list(c *gin.Context) {
-	var req lessonRequestFilter
-	if err := c.ShouldBindQuery(&req); err != nil {
+	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	filter := services.LessonFilter{
-		PageID:   req.PageID,
-		PerPage:  req.PerPage,
-		CourseID: req.CourseID,
+		CourseID: courseID,
 	}
 	courses, err := h.lessonService.List(c.Request.Context(), &filter)
 	if err != nil {

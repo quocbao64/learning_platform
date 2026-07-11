@@ -17,9 +17,9 @@ type courseRepository struct {
 	db *pgxpool.Pool
 }
 
-func (r courseRepository) List(c context.Context, filter *services.CourseFilter) ([]*models.Course, error) {
+func (r *courseRepository) List(c context.Context, filter *services.CourseFilter) ([]*models.Course, error) {
 	var courses []*models.Course
-	query := `SELECT id, title, description, instructor_id, status, created_at, updated_at 
+	query := `SELECT id, title, description, instructor_id, status, total_seats, created_at, updated_at 
 				FROM courses
 				WHERE 1=1`
 	i := 1
@@ -54,11 +54,11 @@ func (r courseRepository) List(c context.Context, filter *services.CourseFilter)
 	return courses, nil
 }
 
-func (r courseRepository) Create(c context.Context, course *models.Course) error {
+func (r *courseRepository) Create(c context.Context, course *models.Course) error {
 	err := r.db.QueryRow(c,
-		`INSERT INTO courses (title, description, instructor_id, status, created_at, updated_at) 
-				VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-		course.Title, course.Description, course.InstructorID, course.Status, time.Now(), time.Now(),
+		`INSERT INTO courses (title, description, instructor_id, status, total_seats, created_at, updated_at) 
+				VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+		course.Title, course.Description, course.InstructorID, course.Status, course.TotalSeats, time.Now(), time.Now(),
 	).Scan(&course.ID)
 
 	var pgErr *pgconn.PgError
@@ -73,10 +73,10 @@ func (r courseRepository) Create(c context.Context, course *models.Course) error
 	return nil
 }
 
-func (r courseRepository) GetByID(c context.Context, id int64) (*models.Course, error) {
+func (r *courseRepository) GetByID(c context.Context, id int64) (*models.Course, error) {
 	var course models.Course
 	err := r.db.QueryRow(c,
-		`SELECT id, title, description, instructor_id, status, created_at, updated_at 
+		`SELECT id, title, description, instructor_id, status, total_seats, created_at, updated_at 
 				FROM courses WHERE id = $1`, id,
 	).Scan(
 		&course.ID,
@@ -84,6 +84,7 @@ func (r courseRepository) GetByID(c context.Context, id int64) (*models.Course, 
 		&course.Description,
 		&course.InstructorID,
 		&course.Status,
+		&course.TotalSeats,
 		&course.CreatedAt,
 		&course.UpdatedAt,
 	)
@@ -120,6 +121,18 @@ func (r courseRepository) GetByID(c context.Context, id int64) (*models.Course, 
 	course.Lessons = lessons
 
 	return &course, nil
+}
+
+func (r *courseRepository) DecrementSeats(c context.Context, courseID int64) (bool, error) {
+	cmd, err := r.db.Exec(c,
+		`UPDATE courses SET total_seats = total_seats - 1 
+               WHERE id = $1 AND total_seats > 0 RETURNING total_seats`, courseID)
+
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return false, err
+	}
+
+	return cmd.RowsAffected() == 1, nil
 }
 
 func NewCourseRepository(db *pgxpool.Pool) *courseRepository {

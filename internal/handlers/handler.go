@@ -7,4 +7,5 @@ var ProviderSet = wire.NewSet(
 	NewUserHandler,
 	NewCourseHandler,
 	NewLessonHandler,
+	NewEnrollmentHandler,
 )

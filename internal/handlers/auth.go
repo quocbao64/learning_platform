@@ -63,13 +63,13 @@ func (h *AuthHandler) register(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.Register(c.Request.Context(), req.FullName, req.Username, req.Password)
+	_, err := h.userService.Register(c.Request.Context(), req.FullName, req.Username, req.Password)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"user": user,
+		"message": "User registered successfully",
 	})
 }

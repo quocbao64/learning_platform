@@ -11,6 +11,7 @@ type Course struct {
 	Title        string     `db:"title" json:"title"`
 	Description  string     `db:"description" json:"description"`
 	Status       string     `db:"status" json:"status"`
+	TotalSeats   int        `db:"total_seats" json:"total_seats"`
 	CreatedAt    *time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    *time.Time `db:"updated_at" json:"updated_at"`
 
@@ -24,6 +25,8 @@ func (course *Course) TableName() string {
 var (
 	ErrCourseAlreadyExists = errors.New("course already exists")
 	ErrCourseNotFound      = errors.New("course not found")
+	ErrCourseNotPublished  = errors.New("course not published")
+	ErrCourseFull          = errors.New("course full")
 )
 
 var (

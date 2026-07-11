@@ -16,6 +16,7 @@ type CourseRepository interface {
 	List(c context.Context, filter *CourseFilter) ([]*models.Course, error)
 	Create(c context.Context, course *models.Course) error
 	GetByID(c context.Context, id int64) (*models.Course, error)
+	DecrementSeats(c context.Context, courseID int64) (bool, error)
 }
 
 type CourseService interface {

@@ -25,13 +25,14 @@ func (h *CourseHandler) RegisterRoute(r *gin.RouterGroup, authMW gin.HandlerFunc
 	{
 		courseGroup.POST("", authMW, h.create)
 		courseGroup.GET("", authMW, h.list)
-		courseGroup.GET("/:id", authMW, h.GetCourseByID)
+		courseGroup.GET("/:course_id", authMW, h.GetCourseByID)
 	}
 }
 
 type courseRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	TotalSeats  int    `json:"total_seats"`
 }
 
 type courseRequestFilter struct {
@@ -53,6 +54,7 @@ func (h *CourseHandler) create(c *gin.Context) {
 		Title:        req.Title,
 		Description:  req.Description,
 		Status:       models.CourseStatusDraft,
+		TotalSeats:   req.TotalSeats,
 	})
 
 	if err != nil {
@@ -90,13 +92,13 @@ func (h *CourseHandler) list(c *gin.Context) {
 }
 
 func (h *CourseHandler) GetCourseByID(c *gin.Context) {
-	courseID, err := strconv.Atoi(c.Param("id"))
+	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	course, err := h.courseService.GetCourseByID(c.Request.Context(), int64(courseID))
+	course, err := h.courseService.GetCourseByID(c.Request.Context(), courseID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

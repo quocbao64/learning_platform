@@ -52,7 +52,7 @@ func (s *userService) Register(ctx context.Context, name, email, password string
 		return nil, err
 	}
 
-	return user, nil
+	return nil, nil
 }
 
 func (s *userService) GetByID(ctx context.Context, id int64) (*models.User, error) {

@@ -7,4 +7,5 @@ var ProviderSet = wire.NewSet(
 	NewUserService, wire.Bind(new(UserService), new(*userService)),
 	NewCourseService, wire.Bind(new(CourseService), new(*courseService)),
 	NewLessonService, wire.Bind(new(LessonService), new(*lessonService)),
+	NewEnrollmentService, wire.Bind(new(EnrollmentService), new(*enrollmentService)),
 )

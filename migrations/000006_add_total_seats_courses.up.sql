@@ -1,0 +1,1 @@
+ALTER TABLE courses ADD COLUMN total_seats INT NOT NULL DEFAULT 0;

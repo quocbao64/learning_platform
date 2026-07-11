@@ -37,7 +37,8 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*models.
 
 func (r *userRepository) Create(ctx context.Context, user *models.User) error {
 	err := r.db.QueryRow(ctx,
-		`INSERT INTO users (email, password, full_name, roles, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)`,
+		`INSERT INTO users (email, password, full_name, roles, created_at, updated_at) 
+				VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
 		user.Email, user.Password, user.FullName, user.Roles, user.CreatedAt, user.UpdatedAt,
 	).Scan(&user.ID)
 
