@@ -41,6 +41,9 @@ func Initialize() (*Container, error) {
 	enrollmentRepository := repositories.NewEnrollmentRepository(pool)
 	enrollmentService := services.NewEnrollmentService(enrollmentRepository, courseRepository)
 	enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentService)
+	progressRepository := repositories.NewProgressRepository(pool)
+	progressService := services.NewProgressService(progressRepository, enrollmentRepository)
+	progressHandler := handlers.NewProgressHandler(progressService)
 	container := &Container{
 		AuthHandler:       authHandler,
 		JWTManager:        manager,
@@ -48,6 +51,7 @@ func Initialize() (*Container, error) {
 		CourseHandler:     courseHandler,
 		LessonHandler:     lessonHandler,
 		EnrollmentHandler: enrollmentHandler,
+		ProgressHandler:   progressHandler,
 	}
 	return container, nil
 }

@@ -104,3 +104,28 @@ func (r *enrollmentRepository) FindByUserIDAndCourseID(c context.Context, userID
 
 	return &enrollment, nil
 }
+
+func (r *enrollmentRepository) FindByID(c context.Context, id int64) (*models.Enrollment, error) {
+	var enrollment models.Enrollment
+	err := r.db.QueryRow(c,
+		`SELECT id, user_id, course_id, status, enrolled_at 
+				FROM enrollments 
+				WHERE id = $1`, id,
+	).Scan(
+		&enrollment.ID,
+		&enrollment.UserID,
+		&enrollment.CourseID,
+		&enrollment.Status,
+		&enrollment.EnrolledAt,
+	)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &enrollment, nil
+}

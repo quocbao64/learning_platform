@@ -15,6 +15,7 @@ type Container struct {
 	CourseHandler     *handlers.CourseHandler
 	LessonHandler     *handlers.LessonHandler
 	EnrollmentHandler *handlers.EnrollmentHandler
+	ProgressHandler   *handlers.ProgressHandler
 }
 
 func (c *Container) SetupRouter() *gin.Engine {
@@ -26,6 +27,7 @@ func (c *Container) SetupRouter() *gin.Engine {
 	c.CourseHandler.RegisterRoute(api, authMiddleware)
 	c.LessonHandler.RegisterRoutes(api, authMiddleware)
 	c.EnrollmentHandler.RegisterRoutes(api, authMiddleware)
+	c.ProgressHandler.RegisterRoutes(api, authMiddleware)
 
 	return r
 }

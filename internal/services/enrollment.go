@@ -15,6 +15,7 @@ type EnrollmentRepository interface {
 	List(c context.Context, filter *EnrollmentFilter) ([]*models.Enrollment, error)
 	Delete(c context.Context, id int64) error
 	FindByUserIDAndCourseID(c context.Context, userID int64, courseID int64) (*models.Enrollment, error)
+	FindByID(c context.Context, id int64) (*models.Enrollment, error)
 }
 
 type EnrollmentService interface {

@@ -11,4 +11,5 @@ var ProviderSet = wire.NewSet(
 	NewCourseRepository, wire.Bind(new(services.CourseRepository), new(*courseRepository)),
 	NewLessonRepository, wire.Bind(new(services.LessonRepository), new(*lessonRepository)),
 	NewEnrollmentRepository, wire.Bind(new(services.EnrollmentRepository), new(*enrollmentRepository)),
+	NewProgressRepository, wire.Bind(new(services.ProgressRepository), new(*progressRepository)),
 )

@@ -19,6 +19,7 @@ func (e Enrollment) TableName() string {
 
 var (
 	ErrEnrollmentAlreadyExists = errors.New("enrollment already exists")
+	ErrEnrollmentNotFound      = errors.New("enrollment not found")
 )
 
 var (
