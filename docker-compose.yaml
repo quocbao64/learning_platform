@@ -1,0 +1,30 @@
+version:  '3.8'
+services:
+    app:
+        build: .
+        container_name: api
+        ports:
+            - "8080:8080"
+        depends_on:
+          - postgres
+        env_file:
+          - /etc/learning_platform/prod.env
+
+    postgres:
+        image: postgres:latest
+        container_name: postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        environment:
+            PGDATA: /var/lib/postgresql/data/pgdata
+        env_file:
+          - /etc/learning_platform/prod.db.env
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+          interval: 10s
+          timeout: 5s
+          retries: 1
+volumes:
+    postgres_data:

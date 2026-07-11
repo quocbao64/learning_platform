@@ -1,0 +1,7 @@
+.idea/
+.vscode/
+.env
+*.out
+coverage.*
+*.coverprofile
+profile.cov
