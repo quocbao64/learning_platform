@@ -17,7 +17,7 @@ type courseRepository struct {
 	db *pgxpool.Pool
 }
 
-func (c2 courseRepository) List(c context.Context, filter *services.CourseFilter) ([]*models.Course, error) {
+func (r courseRepository) List(c context.Context, filter *services.CourseFilter) ([]*models.Course, error) {
 	var courses []*models.Course
 	query := `SELECT id, title, description, instructor_id, status, created_at, updated_at 
 				FROM courses
@@ -39,7 +39,7 @@ func (c2 courseRepository) List(c context.Context, filter *services.CourseFilter
 
 	query += fmt.Sprintf(` ORDER BY created_at DESC LIMIT %d OFFSET %d`, filter.PerPage, (filter.PageID)*filter.PerPage)
 
-	rows, err := c2.db.Query(c, query, args...)
+	rows, err := r.db.Query(c, query, args...)
 
 	if err != nil {
 		return nil, err
@@ -54,8 +54,8 @@ func (c2 courseRepository) List(c context.Context, filter *services.CourseFilter
 	return courses, nil
 }
 
-func (c2 courseRepository) Create(c context.Context, course *models.Course) error {
-	err := c2.db.QueryRow(c,
+func (r courseRepository) Create(c context.Context, course *models.Course) error {
+	err := r.db.QueryRow(c,
 		`INSERT INTO courses (title, description, instructor_id, status, created_at, updated_at) 
 				VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
 		course.Title, course.Description, course.InstructorID, course.Status, time.Now(), time.Now(),
@@ -71,6 +71,55 @@ func (c2 courseRepository) Create(c context.Context, course *models.Course) erro
 	}
 
 	return nil
+}
+
+func (r courseRepository) GetByID(c context.Context, id int64) (*models.Course, error) {
+	var course models.Course
+	err := r.db.QueryRow(c,
+		`SELECT id, title, description, instructor_id, status, created_at, updated_at 
+				FROM courses WHERE id = $1`, id,
+	).Scan(
+		&course.ID,
+		&course.Title,
+		&course.Description,
+		&course.InstructorID,
+		&course.Status,
+		&course.CreatedAt,
+		&course.UpdatedAt,
+	)
+
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return nil, models.ErrCourseNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	lessonsRows, err := r.db.Query(c,
+		`SELECT id, title, order_index, created_at, updated_at
+				FROM lessons
+    			WHERE course_id = $1 ORDER BY order_index`, id)
+	if err != nil {
+		return nil, err
+	}
+
+	defer lessonsRows.Close()
+
+	var lessons []*models.Lesson
+	for lessonsRows.Next() {
+		lesson := models.Lesson{}
+		err = lessonsRows.Scan(&lesson.ID, &lesson.Title, &lesson.OrderIndex, &lesson.CreatedAt, &lesson.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		lessons = append(lessons, &lesson)
+	}
+
+	course.Lessons = lessons
+
+	return &course, nil
 }
 
 func NewCourseRepository(db *pgxpool.Pool) *courseRepository {

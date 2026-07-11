@@ -5,6 +5,7 @@ import (
 	"learning-platform/internal/models"
 	"learning-platform/internal/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +25,7 @@ func (h *CourseHandler) RegisterRoute(r *gin.RouterGroup, authMW gin.HandlerFunc
 	{
 		courseGroup.POST("", authMW, h.create)
 		courseGroup.GET("", authMW, h.list)
+		courseGroup.GET("/:id", authMW, h.GetCourseByID)
 	}
 }
 
@@ -84,5 +86,23 @@ func (h *CourseHandler) list(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"courses": courses,
+	})
+}
+
+func (h *CourseHandler) GetCourseByID(c *gin.Context) {
+	courseID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	course, err := h.courseService.GetCourseByID(c.Request.Context(), int64(courseID))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"course": course,
 	})
 }

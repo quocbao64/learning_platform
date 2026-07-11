@@ -13,6 +13,7 @@ type Container struct {
 	JWTManager    *jwt.Manager
 	UserHandler   *handlers.UserHandler
 	CourseHandler *handlers.CourseHandler
+	LessonHandler *handlers.LessonHandler
 }
 
 func (c *Container) SetupRouter() *gin.Engine {
@@ -22,6 +23,7 @@ func (c *Container) SetupRouter() *gin.Engine {
 	c.AuthHandler.RegisterRoutes(api, authMiddleware)
 	c.UserHandler.RegisterRoutes(api, authMiddleware)
 	c.CourseHandler.RegisterRoute(api, authMiddleware)
+	c.LessonHandler.RegisterRoutes(api, authMiddleware)
 
 	return r
 }

@@ -13,6 +13,8 @@ type Course struct {
 	Status       string     `db:"status" json:"status"`
 	CreatedAt    *time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    *time.Time `db:"updated_at" json:"updated_at"`
+
+	Lessons []*Lesson `db:"-" json:"lessons"`
 }
 
 func (course *Course) TableName() string {
