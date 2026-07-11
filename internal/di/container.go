@@ -9,9 +9,10 @@ import (
 )
 
 type Container struct {
-	AuthHandler *handlers.AuthHandler
-	JWTManager  *jwt.Manager
-	UserHandler *handlers.UserHandler
+	AuthHandler   *handlers.AuthHandler
+	JWTManager    *jwt.Manager
+	UserHandler   *handlers.UserHandler
+	CourseHandler *handlers.CourseHandler
 }
 
 func (c *Container) SetupRouter() *gin.Engine {
@@ -20,6 +21,7 @@ func (c *Container) SetupRouter() *gin.Engine {
 	authMiddleware := middleware.Auth(c.JWTManager)
 	c.AuthHandler.RegisterRoutes(api, authMiddleware)
 	c.UserHandler.RegisterRoutes(api, authMiddleware)
+	c.CourseHandler.RegisterRoute(api, authMiddleware)
 
 	return r
 }

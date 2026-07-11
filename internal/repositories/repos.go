@@ -8,4 +8,5 @@ import (
 
 var ProviderSet = wire.NewSet(
 	NewUserRepository, wire.Bind(new(services.UserRepository), new(*userRepository)),
+	NewCourseRepository, wire.Bind(new(services.CourseRepository), new(*courseRepository)),
 )

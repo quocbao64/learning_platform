@@ -32,10 +32,14 @@ func Initialize() (*Container, error) {
 	userService := services.NewUserService(userRepository)
 	authHandler := handlers.NewAuthHandler(authService, userService)
 	userHandler := handlers.NewUserHandler(userService)
+	courseRepository := repositories.NewCourseRepository(pool)
+	courseService := services.NewCourseService(courseRepository)
+	courseHandler := handlers.NewCourseHandler(courseService)
 	container := &Container{
-		AuthHandler: authHandler,
-		JWTManager:  manager,
-		UserHandler: userHandler,
+		AuthHandler:   authHandler,
+		JWTManager:    manager,
+		UserHandler:   userHandler,
+		CourseHandler: courseHandler,
 	}
 	return container, nil
 }
