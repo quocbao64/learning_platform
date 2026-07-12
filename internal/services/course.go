@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"learning-platform/internal/models"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type CourseFilter struct {
@@ -20,6 +22,8 @@ type CourseRepository interface {
 	GetByID(c context.Context, id int64) (*models.Course, error)
 	DecrementSeats(c context.Context, courseID int64) (bool, error)
 	GetSeatsByIDs(c context.Context, courseIDs []int64) (map[int64]int, error)
+	DecrementSeatsTx(c context.Context, tx pgx.Tx, courseID int64) (bool, error)
+	IncrementSeatsTx(c context.Context, tx pgx.Tx, courseID int64) (bool, error)
 }
 
 type CourseService interface {

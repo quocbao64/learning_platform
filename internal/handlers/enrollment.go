@@ -24,7 +24,7 @@ func NewEnrollmentHandler(enrollmentService services.EnrollmentService) *Enrollm
 func (h *EnrollmentHandler) RegisterRoutes(router *gin.RouterGroup, authMW gin.HandlerFunc) {
 	router.GET("/me/enrollments", authMW, h.listEnrollments)
 	router.POST("/courses/:course_id/enroll", authMW, h.enroll)
-	router.DELETE("/courses/:course_id/enroll", authMW, h.deleteEnrollment)
+	router.DELETE("/courses/:course_id/enroll", authMW, h.cancel)
 }
 
 func (h *EnrollmentHandler) enroll(c *gin.Context) {
@@ -70,7 +70,7 @@ func (h *EnrollmentHandler) listEnrollments(c *gin.Context) {
 	})
 }
 
-func (h *EnrollmentHandler) deleteEnrollment(c *gin.Context) {
+func (h *EnrollmentHandler) cancel(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

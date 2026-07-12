@@ -13,4 +13,5 @@ var ProviderSet = wire.NewSet(
 	NewEnrollmentRepository, wire.Bind(new(services.EnrollmentRepository), new(*enrollmentRepository)),
 	NewProgressRepository, wire.Bind(new(services.ProgressRepository), new(*progressRepository)),
 	NewRedisCache, wire.Bind(new(services.Cache), new(*redisCache)),
+	NewTxManager, wire.Bind(new(services.TxManager), new(*txManager)),
 )

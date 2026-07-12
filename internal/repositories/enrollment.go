@@ -129,3 +129,29 @@ func (r *enrollmentRepository) FindByID(c context.Context, id int64) (*models.En
 
 	return &enrollment, nil
 }
+
+func (r *enrollmentRepository) CreateTx(c context.Context, tx pgx.Tx, enrollment *models.Enrollment) (*models.Enrollment, error) {
+	err := tx.QueryRow(c,
+		`INSERT INTO enrollments (user_id, course_id, status, enrolled_at)
+				VALUES ($1, $2, $3, $4) RETURNING id`,
+		enrollment.UserID,
+		enrollment.CourseID,
+		enrollment.Status,
+		enrollment.EnrolledAt,
+	).Scan(&enrollment.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return enrollment, nil
+}
+
+func (r *enrollmentRepository) DeleteTx(c context.Context, tx pgx.Tx, id int64) error {
+	err := tx.QueryRow(c, `DELETE FROM enrollments WHERE id = $1`, id).Scan()
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return err
+	}
+
+	return nil
+}

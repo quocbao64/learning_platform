@@ -2,7 +2,11 @@ package services
 
 import (
 	"context"
+	"errors"
 	"learning-platform/internal/models"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type EnrollmentFilter struct {
@@ -16,6 +20,8 @@ type EnrollmentRepository interface {
 	Delete(c context.Context, id int64) error
 	FindByUserIDAndCourseID(c context.Context, userID int64, courseID int64) (*models.Enrollment, error)
 	FindByID(c context.Context, id int64) (*models.Enrollment, error)
+	CreateTx(c context.Context, tx pgx.Tx, enrollment *models.Enrollment) (*models.Enrollment, error)
+	DeleteTx(c context.Context, tx pgx.Tx, id int64) error
 }
 
 type EnrollmentService interface {
@@ -27,12 +33,21 @@ type EnrollmentService interface {
 type enrollmentService struct {
 	repo       EnrollmentRepository
 	courseRepo CourseRepository
+	txManager  TxManager
+	cache      Cache
 }
 
-func NewEnrollmentService(repo EnrollmentRepository, courseRepo CourseRepository) *enrollmentService {
+func NewEnrollmentService(
+	repo EnrollmentRepository,
+	courseRepo CourseRepository,
+	txManager TxManager,
+	cache Cache,
+) *enrollmentService {
 	return &enrollmentService{
 		repo:       repo,
 		courseRepo: courseRepo,
+		txManager:  txManager,
+		cache:      cache,
 	}
 }
 
@@ -59,15 +74,28 @@ func (s *enrollmentService) CreateEnrollment(c context.Context, enrollment *mode
 		return nil, models.ErrEnrollmentAlreadyExists
 	}
 
-	isDecrease, err := s.courseRepo.DecrementSeats(c, enrollment.CourseID)
-	if err != nil {
-		return nil, err
-	}
-	if !isDecrease {
-		return nil, models.ErrCourseFull
-	}
+	err = s.txManager.ExecTx(c, func(c context.Context, tx pgx.Tx) error {
+		isDecrease, err := s.courseRepo.DecrementSeatsTx(c, tx, enrollment.CourseID)
+		if err != nil {
+			return err
+		}
+		if !isDecrease {
+			return models.ErrCourseFull
+		}
 
-	return s.repo.Create(c, enrollment)
+		if _, err := s.repo.CreateTx(c, tx, enrollment); err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+				return models.ErrEnrollmentAlreadyExists
+			}
+
+			return err
+		}
+
+		return nil
+	})
+
+	return enrollment, nil
 }
 
 func (s *enrollmentService) ListEnrollment(c context.Context, filter *EnrollmentFilter) ([]*models.Enrollment, error) {
@@ -82,6 +110,26 @@ func (s *enrollmentService) DeleteEnrollment(c context.Context, userID int64, co
 
 	if enrollment == nil {
 		return nil
+	}
+
+	if enrollment.UserID != userID {
+		return models.ErrEnrollmentNotFound
+	}
+
+	err = s.txManager.ExecTx(c, func(c context.Context, tx pgx.Tx) error {
+		if err := s.repo.DeleteTx(c, tx, enrollment.ID); err != nil {
+			return err
+		}
+
+		if _, err := s.courseRepo.IncrementSeatsTx(c, tx, enrollment.CourseID); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
 	}
 
 	return s.repo.Delete(c, enrollment.ID)

@@ -161,6 +161,30 @@ func (r *courseRepository) GetSeatsByIDs(c context.Context, courseIDs []int64) (
 	return result, nil
 }
 
+func (r *courseRepository) DecrementSeatsTx(c context.Context, tx pgx.Tx, courseID int64) (bool, error) {
+	cmd, err := tx.Exec(c,
+		`UPDATE courses SET total_seats = total_seats - 1 
+               WHERE id = $1 AND total_seats > 0 RETURNING total_seats`, courseID)
+
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return false, err
+	}
+
+	return cmd.RowsAffected() == 1, nil
+}
+
+func (r *courseRepository) IncrementSeatsTx(c context.Context, tx pgx.Tx, courseID int64) (bool, error) {
+	cmd, err := tx.Exec(c,
+		`UPDATE courses SET total_seats = total_seats + 1 
+			   WHERE id = $1 RETURNING total_seats`, courseID)
+
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return false, err
+	}
+
+	return cmd.RowsAffected() == 1, nil
+}
+
 func NewCourseRepository(db *pgxpool.Pool) *courseRepository {
 	return &courseRepository{
 		db: db,
