@@ -1,12 +1,16 @@
 package configs
 
-import "github.com/spf13/viper"
+import (
+	"github.com/google/wire"
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	DbConfig        DbConfig        `mapstructure:",squash"`
 	MigrationConfig MigrationConfig `mapstructure:",squash"`
 	AppConfig       AppConfig       `mapstructure:",squash"`
 	JWTConfig       JWTConfig       `mapstructure:",squash"`
+	RedisConfig     RedisConfig     `mapstructure:",squash"`
 }
 
 type DbConfig struct {
@@ -24,6 +28,14 @@ type AppConfig struct {
 type JWTConfig struct {
 	Secret     string `mapstructure:"JWT_SECRET"`
 	TTLMinutes int    `mapstructure:"JWT_TTL_MINUTES"`
+}
+
+type RedisConfig struct {
+	Host     string `mapstructure:"REDIS_HOST"`
+	Port     string `mapstructure:"REDIS_PORT"`
+	Password string `mapstructure:"REDIS_PASSWORD"`
+	DB       int    `mapstructure:"REDIS_DB"`
+	TTL      int    `mapstructure:"REDIS_TTL_MINUTES"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -44,3 +56,5 @@ func LoadConfig() (*Config, error) {
 
 	return &config, nil
 }
+
+var ProviderSet = wire.NewSet(LoadConfig)

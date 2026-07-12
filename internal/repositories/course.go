@@ -135,6 +135,32 @@ func (r *courseRepository) DecrementSeats(c context.Context, courseID int64) (bo
 	return cmd.RowsAffected() == 1, nil
 }
 
+func (r *courseRepository) GetSeatsByIDs(c context.Context, courseIDs []int64) (map[int64]int, error) {
+	if len(courseIDs) == 0 {
+		return map[int64]int{}, nil
+	}
+
+	rows, err := r.db.Query(c,
+		`SELECT id, total_seats FROM courses WHERE id = ANY($1)`, courseIDs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[int64]int, len(courseIDs))
+	for rows.Next() {
+		var id int64
+		var totalSeats int
+		if err = rows.Scan(&id, &totalSeats); err != nil {
+			return nil, err
+		}
+
+		result[id] = totalSeats
+	}
+
+	return result, nil
+}
+
 func NewCourseRepository(db *pgxpool.Pool) *courseRepository {
 	return &courseRepository{
 		db: db,

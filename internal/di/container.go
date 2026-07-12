@@ -6,6 +6,7 @@ import (
 	"learning-platform/internal/platform/jwt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 type Container struct {
@@ -16,6 +17,7 @@ type Container struct {
 	LessonHandler     *handlers.LessonHandler
 	EnrollmentHandler *handlers.EnrollmentHandler
 	ProgressHandler   *handlers.ProgressHandler
+	RedisClient       *redis.Client
 }
 
 func (c *Container) SetupRouter() *gin.Engine {

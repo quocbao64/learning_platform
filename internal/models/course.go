@@ -34,3 +34,13 @@ var (
 	CourseStatusPublished = "published"
 	CourseStatusArchived  = "archived"
 )
+
+type CachedCourse struct {
+	ID           int64      `db:"id" json:"id"`
+	InstructorID int64      `db:"instructor_id" json:"instructor_id"`
+	Title        string     `db:"title" json:"title"`
+	Description  string     `db:"description" json:"description"`
+	Status       string     `db:"status" json:"status"`
+	CreatedAt    *time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    *time.Time `db:"updated_at" json:"updated_at"`
+}

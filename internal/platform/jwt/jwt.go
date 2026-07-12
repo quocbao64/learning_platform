@@ -2,9 +2,11 @@ package jwt
 
 import (
 	"errors"
+	"learning-platform/internal/configs"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/wire"
 )
 
 var ErrInvalidToken = errors.New("invalid token")
@@ -55,3 +57,9 @@ func (m *Manager) ParseToken(tokenString string) (*Claims, error) {
 	}
 	return claims, nil
 }
+
+func Provide(cfg *configs.Config) *Manager {
+	return NewManager(cfg.JWTConfig.Secret, cfg.JWTConfig.TTLMinutes)
+}
+
+var ProviderSet = wire.NewSet(Provide)

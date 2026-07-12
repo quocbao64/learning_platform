@@ -53,7 +53,7 @@ func (h *CourseHandler) create(c *gin.Context) {
 		InstructorID: middleware.UserID(c),
 		Title:        req.Title,
 		Description:  req.Description,
-		Status:       models.CourseStatusDraft,
+		Status:       models.CourseStatusPublished,
 		TotalSeats:   req.TotalSeats,
 	})
 

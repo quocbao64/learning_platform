@@ -11,6 +11,7 @@ import (
 	"learning-platform/internal/handlers"
 	"learning-platform/internal/platform/db"
 	"learning-platform/internal/platform/jwt"
+	"learning-platform/internal/platform/redis"
 	"learning-platform/internal/repositories"
 	"learning-platform/internal/services"
 )
@@ -33,13 +34,18 @@ func Initialize() (*Container, error) {
 	authHandler := handlers.NewAuthHandler(authService, userService)
 	userHandler := handlers.NewUserHandler(userService)
 	courseRepository := repositories.NewCourseRepository(pool)
-	courseService := services.NewCourseService(courseRepository)
+	client, err := redis.Connect(config)
+	if err != nil {
+		return nil, err
+	}
+	redisCache := repositories.NewRedisCache(client, config)
+	courseService := services.NewCourseService(courseRepository, redisCache)
 	courseHandler := handlers.NewCourseHandler(courseService)
 	lessonRepository := repositories.NewLessonRepository(pool)
 	lessonService := services.NewLessonService(lessonRepository)
 	lessonHandler := handlers.NewLessonHandler(lessonService)
 	enrollmentRepository := repositories.NewEnrollmentRepository(pool)
-	enrollmentService := services.NewEnrollmentService(enrollmentRepository, courseRepository)
+	enrollmentService := services.NewEnrollmentService(enrollmentRepository, courseRepository, redisCache)
 	enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentService)
 	progressRepository := repositories.NewProgressRepository(pool)
 	progressService := services.NewProgressService(progressRepository, enrollmentRepository)
@@ -52,6 +58,7 @@ func Initialize() (*Container, error) {
 		LessonHandler:     lessonHandler,
 		EnrollmentHandler: enrollmentHandler,
 		ProgressHandler:   progressHandler,
+		RedisClient:       client,
 	}
 	return container, nil
 }
