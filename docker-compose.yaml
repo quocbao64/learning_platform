@@ -16,7 +16,7 @@ services:
         image: postgres:latest
         container_name: postgres
         ports:
-            - "5433:5432"
+            - "5432:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
         environment:
@@ -41,13 +41,6 @@ services:
           interval: 10s
           timeout: 5s
           retries: 1
-        networks:
-            - default
-    redis-insight:
-        image: redislabs/redisinsight:latest
-        container_name: redisinsight
-        ports:
-            - "8001:5540"
         networks:
             - default
 volumes:
