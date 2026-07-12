@@ -8,6 +8,7 @@ import (
 	"learning-platform/internal/handlers"
 	"learning-platform/internal/platform/db"
 	"learning-platform/internal/platform/jwt"
+	"learning-platform/internal/platform/ratelimit"
 	"learning-platform/internal/platform/redis"
 	"learning-platform/internal/repositories"
 	"learning-platform/internal/services"
@@ -24,6 +25,7 @@ func Initialize() (*Container, error) {
 		jwt.ProviderSet,
 		configs.ProviderSet,
 		redis.ProviderSet,
+		ratelimit.ProviderSet,
 		wire.Struct(new(Container), "*"),
 	)
 	return nil, nil

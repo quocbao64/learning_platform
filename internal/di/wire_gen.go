@@ -11,6 +11,7 @@ import (
 	"learning-platform/internal/handlers"
 	"learning-platform/internal/platform/db"
 	"learning-platform/internal/platform/jwt"
+	"learning-platform/internal/platform/ratelimit"
 	"learning-platform/internal/platform/redis"
 	"learning-platform/internal/repositories"
 	"learning-platform/internal/services"
@@ -45,11 +46,12 @@ func Initialize() (*Container, error) {
 	lessonService := services.NewLessonService(lessonRepository)
 	lessonHandler := handlers.NewLessonHandler(lessonService)
 	enrollmentRepository := repositories.NewEnrollmentRepository(pool)
-	enrollmentService := services.NewEnrollmentService(enrollmentRepository, courseRepository, redisCache)
+	enrollmentService := services.NewEnrollmentService(enrollmentRepository, courseRepository)
 	enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentService)
 	progressRepository := repositories.NewProgressRepository(pool)
 	progressService := services.NewProgressService(progressRepository, enrollmentRepository)
 	progressHandler := handlers.NewProgressHandler(progressService)
+	rateLimiter := ratelimit.NewRateLimiter(client)
 	container := &Container{
 		AuthHandler:       authHandler,
 		JWTManager:        manager,
@@ -59,6 +61,7 @@ func Initialize() (*Container, error) {
 		EnrollmentHandler: enrollmentHandler,
 		ProgressHandler:   progressHandler,
 		RedisClient:       client,
+		RateLimit:         rateLimiter,
 	}
 	return container, nil
 }

@@ -19,10 +19,10 @@ func NewAuthHandler(authService services.AuthService, userService services.UserS
 	}
 }
 
-func (h *AuthHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc) {
+func (h *AuthHandler) RegisterRoutes(r *gin.RouterGroup, ratelimit gin.HandlerFunc) {
 	authGroup := r.Group("/auth")
 	{
-		authGroup.POST("/login", h.login)
+		authGroup.POST("/login", ratelimit, h.login)
 		authGroup.POST("/register", h.register)
 	}
 }
