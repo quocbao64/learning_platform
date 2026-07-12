@@ -109,9 +109,9 @@ func (s *courseService) CreateCourse(c context.Context, course *models.Course) e
 func (s *courseService) GetCourseByID(c context.Context, id int64) (*models.Course, error) {
 	cacheKey := fmt.Sprintf("course:get:id=%d", id)
 	if cachedCourses, err := s.cache.Get(c, cacheKey); err == nil {
-		var course models.Course
-		if err := json.Unmarshal([]byte(cachedCourses), &course); err != nil {
-			return nil, err
+		var course *models.Course
+		if err := json.Unmarshal([]byte(cachedCourses), &course); err == nil {
+			return course, err
 		}
 	}
 
@@ -126,7 +126,7 @@ func (s *courseService) GetCourseByID(c context.Context, id int64) (*models.Cour
 			return nil, err
 		}
 	}
-	return s.repo.GetByID(c, id)
+	return course, nil
 }
 
 func (s *courseService) attachSeatsToCourses(c context.Context, courses []*models.Course) error {

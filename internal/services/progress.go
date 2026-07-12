@@ -54,7 +54,7 @@ func (s *progressService) GetProgress(c context.Context, userID int64, enrollmen
 
 	var percentage float64
 	if totalLessons > 0 {
-		percentage = float64(totalLessons) / float64(totalCompletedLessons) * 100
+		percentage = float64(totalCompletedLessons) / float64(totalLessons) * 100
 	}
 
 	return &models.CourseProgress{

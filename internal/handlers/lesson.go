@@ -29,10 +29,14 @@ func (h *LessonHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFun
 }
 
 type lessonRequest struct {
-	CourseID   int64  `json:"course_id" binding:"required"`
 	Title      string `json:"title" binding:"required"`
-	Content    string `json:"content"`
-	OrderIndex int64  `json:"order_index"`
+	Content    string `json:"content" binding:"required"`
+	OrderIndex int64  `json:"order_index" binding:"required"`
+}
+
+type listLessonsRequest struct {
+	PageID  int `form:"page_id"`
+	PerPage int `form:"per_page"`
 }
 
 func (h *LessonHandler) list(c *gin.Context) {
@@ -42,8 +46,16 @@ func (h *LessonHandler) list(c *gin.Context) {
 		return
 	}
 
+	var req listLessonsRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	filter := services.LessonFilter{
 		CourseID: courseID,
+		PageID:   req.PageID,
+		PerPage:  req.PerPage,
 	}
 	courses, err := h.lessonService.List(c.Request.Context(), &filter)
 	if err != nil {
@@ -51,18 +63,26 @@ func (h *LessonHandler) list(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, courses)
+	c.JSON(http.StatusOK, gin.H{
+		"data": courses,
+	})
 }
 
 func (h *LessonHandler) create(c *gin.Context) {
+	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	var req lessonRequest
 	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.lessonService.CreateLesson(c.Request.Context(), &models.Lesson{
-		CourseID:   req.CourseID,
+	err = h.lessonService.CreateLesson(c.Request.Context(), &models.Lesson{
+		CourseID:   courseID,
 		Title:      req.Title,
 		Content:    req.Content,
 		OrderIndex: req.OrderIndex,

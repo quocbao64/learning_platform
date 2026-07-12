@@ -95,6 +95,10 @@ func (s *enrollmentService) CreateEnrollment(c context.Context, enrollment *mode
 		return nil
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	return enrollment, nil
 }
 
@@ -132,5 +136,5 @@ func (s *enrollmentService) DeleteEnrollment(c context.Context, userID int64, co
 		return err
 	}
 
-	return s.repo.Delete(c, enrollment.ID)
+	return nil
 }
