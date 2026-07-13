@@ -20,7 +20,9 @@ jobs:
           cache: true
 
       - name: Install tools
-        run: go install github.com/google/wire/cmd/wire@latest
+        run: |
+          go install github.com/google/wire/cmd/wire@latest
+          go install github.com/vektra/mockery/v2@latest
 
       - name: Generate wire
         run: make wire
