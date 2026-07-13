@@ -24,7 +24,6 @@ func (r *lessonRepository) List(c context.Context, filter *services.LessonFilter
 	if filter.CourseID != 0 {
 		query += fmt.Sprintf(` AND course_id = $%d`, i)
 		args = append(args, filter.CourseID)
-		i++
 	}
 
 	query += fmt.Sprintf(` ORDER BY order_index ASC LIMIT %d OFFSET %d`, filter.PerPage, (filter.PageID)*filter.PerPage)

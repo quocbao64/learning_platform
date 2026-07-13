@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Install tools
+        run: |
+          go install github.com/google/wire/cmd/wire@latest
+          go install github.com/vektra/mockery/v2@latest
+
+      - name: Generate wire
+        run: make wire
+
+      - name: Generate mockery
+        run: make mockery
+
+      - name: Build
+        run: go build ./...
+
+      - name: Unit tests
+        run: go test ./... -short
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - name: golangci-lint
+        run: golangci-lint run
