@@ -40,6 +40,16 @@ type registerRequest struct {
 	Roles    string `json:"roles" binding:"required"`
 }
 
+// @Summary Đăng nhập tài khoản
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body loginRequest true "Tên đăng nhập và mật khẩu"
+// @Success 200 {object} object{access_token=string} "Đăng nhập thành công"
+// @Failure 400 {object} response.ErrorResponse "Dữ liệu không hợp lệ"
+// @Failure 401 {object} response.ErrorResponse "Sai tên đăng nhập hoặc mật khẩu"
+// @Failure 429 {object} response.ErrorResponse "Đăng nhập quá nhiều lần"
+// @Router /auth/login [post]
 func (h *AuthHandler) login(c *gin.Context) {
 	var req loginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -58,6 +68,14 @@ func (h *AuthHandler) login(c *gin.Context) {
 	})
 }
 
+// @Summary Đăng ký tài khoản mới
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body registerRequest true "Thông tin tài khoản"
+// @Success 200 {object} object{message=string} "Đăng ký tài khoản thành công"
+// @Failure 400 {object} response.ErrorResponse "Dữ liệu không hợp lệ"
+// @Router /auth/register [post]
 func (h *AuthHandler) register(c *gin.Context) {
 	var req registerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

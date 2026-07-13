@@ -10,6 +10,15 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+// @title Learning Platform API
+// @version 1.0
+// @description API learning_platform
+// @host localhost:8080
+// @BasePath /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Bearer Token
 func main() {
 	cfg, err := configs.LoadConfig()
 	if err != nil {

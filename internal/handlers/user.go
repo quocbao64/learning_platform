@@ -43,6 +43,14 @@ func toUserResponse(user *models.User) *userResponse {
 	}
 }
 
+// @Summary Lấy thông tin tài khoản đang đăng nhập
+// @Tags Users
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} object{user=userResponse} "Thông tin tài khoản"
+// @Failure 401 {object} response.ErrorResponse "Chưa đăng nhập hoặc token không hợp lệ"
+// @Failure 404 {object} response.ErrorResponse "Không tìm thấy người dùng"
+// @Router /users/me [get]
 func (h *UserHandler) getCurrentUser(c *gin.Context) {
 	user, err := h.userService.GetByID(c.Request.Context(), middleware.UserID(c))
 	if err != nil {

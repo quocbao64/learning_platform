@@ -1,0 +1,670 @@
+basePath: /api/v1
+definitions:
+  handlers.courseRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      total_seats:
+        type: integer
+    type: object
+  handlers.lessonRequest:
+    properties:
+      content:
+        type: string
+      order_index:
+        type: integer
+      title:
+        type: string
+    required:
+    - content
+    - order_index
+    - title
+    type: object
+  handlers.loginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handlers.registerRequest:
+    properties:
+      full_name:
+        type: string
+      password:
+        type: string
+      roles:
+        type: string
+      username:
+        type: string
+    required:
+    - full_name
+    - password
+    - roles
+    - username
+    type: object
+  handlers.updateCourseRequest:
+    properties:
+      description:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      total_seats:
+        type: integer
+    type: object
+  handlers.userResponse:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      roles:
+        type: string
+    type: object
+  models.Course:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      instructor_id:
+        type: integer
+      lessons:
+        items:
+          $ref: '#/definitions/models.Lesson'
+        type: array
+      status:
+        type: string
+      title:
+        type: string
+      total_seats:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.CourseProgress:
+    properties:
+      completed_count:
+        type: integer
+      enrollment_id:
+        type: integer
+      percent_completed:
+        type: number
+      total_lessons:
+        type: integer
+    type: object
+  models.Enrollment:
+    properties:
+      course_id:
+        type: integer
+      enrolled_at:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.Lesson:
+    properties:
+      content:
+        type: string
+      course_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      order_index:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.ErrorDetail:
+    properties:
+      code:
+        type: string
+      details: {}
+      message:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/response.ErrorDetail'
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API learning_platform
+  title: Learning Platform API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tên đăng nhập và mật khẩu
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Đăng nhập thành công
+          schema:
+            properties:
+              access_token:
+                type: string
+            type: object
+        "400":
+          description: Dữ liệu không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Sai tên đăng nhập hoặc mật khẩu
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "429":
+          description: Đăng nhập quá nhiều lần
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Đăng nhập tài khoản
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Thông tin tài khoản
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Đăng ký tài khoản thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Dữ liệu không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Đăng ký tài khoản mới
+      tags:
+      - Auth
+  /courses:
+    get:
+      parameters:
+      - description: Số trang
+        in: query
+        name: page_id
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: per_page
+        type: integer
+      - description: Lọc theo trạng thái (draft, published, archived)
+        in: query
+        name: status
+        type: string
+      - description: Lọc theo từ khóa
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Danh sách khóa học
+          schema:
+            properties:
+              courses:
+                items:
+                  $ref: '#/definitions/models.Course'
+                type: array
+            type: object
+        "400":
+          description: Params không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Danh sách khóa học
+      tags:
+      - Courses
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Thông tin khóa học
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.courseRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Tạo khóa học thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Dữ liệu đầu vào không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Không có quyền tạo khóa học
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Tạo khóa học mới
+      tags:
+      - Courses
+  /courses/{course_id}:
+    delete:
+      parameters:
+      - description: ID khóa học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Xóa khóa học thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Không tìm thấy khóa học hoặc khóa học đã có người đăng ký
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Không có quyền xóa khóa học
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Xóa khóa học
+      tags:
+      - Courses
+    get:
+      parameters:
+      - description: ID khóa học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            properties:
+              course:
+                $ref: '#/definitions/models.Course'
+            type: object
+        "400":
+          description: Không tìm thấy khóa học
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Chi tiết khóa học
+      tags:
+      - Courses
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID khóa học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      - description: Thông tin cập nhật khóa học
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.updateCourseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cập nhật khóa học thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Dữ liệu đầu vào không hợp lệ hoặc không tìm thấy khóa học
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Không có quyền cập nhật khóa học
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Cập nhật khóa học
+      tags:
+      - Courses
+  /courses/{course_id}/enroll:
+    delete:
+      parameters:
+      - description: ID khóa học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Hủy đăng ký thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Không tìm thấy đăng ký học
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Hủy đăng ký học
+      tags:
+      - Enrollments
+    post:
+      parameters:
+      - description: ID khoá học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Đăng ký học thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Khóa học đã đầy hoặc đã đăng ký trước đó
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Đăng ký khóa học
+      tags:
+      - Enrollments
+  /courses/{course_id}/lessons:
+    get:
+      parameters:
+      - description: ID khóa học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      - description: Số trang
+        in: query
+        name: page_id
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Danh sách bài học
+          schema:
+            properties:
+              data:
+                items:
+                  $ref: '#/definitions/models.Lesson'
+                type: array
+            type: object
+        "400":
+          description: ID khóa học không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Danh sách bài học của khóa học
+      tags:
+      - Lessons
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID khóa học
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      - description: Thông tin bài học
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.lessonRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Tạo bài học thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: Dữ liệu đầu vào không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Tạo bài học mới
+      tags:
+      - Lessons
+  /enrollments/{enrollment_id}/lessons/{lesson_id}/progress:
+    patch:
+      parameters:
+      - description: ID đăng ký khóa học
+        in: path
+        name: enrollment_id
+        required: true
+        type: integer
+      - description: ID bài học
+        in: path
+        name: lesson_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cập nhật tiến độ thành công
+          schema:
+            properties:
+              message:
+                type: string
+            type: object
+        "400":
+          description: ID đăng ký khóa học hoặc ID bài học không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Cập nhật tiến độ khóa học
+      tags:
+      - Progress
+  /enrollments/{enrollment_id}/progress:
+    get:
+      parameters:
+      - description: ID đăng ký khóa học
+        in: path
+        name: enrollment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tiến độ học tập
+          schema:
+            properties:
+              progress:
+                $ref: '#/definitions/models.CourseProgress'
+            type: object
+        "400":
+          description: ID đăng ký khóa học không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Xem tiến độ học tập
+      tags:
+      - Progress
+  /me/enrollments:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Danh sách đăng ký học
+          schema:
+            properties:
+              enrollments:
+                items:
+                  $ref: '#/definitions/models.Enrollment'
+                type: array
+            type: object
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Danh sách khóa học đã đăng ký
+      tags:
+      - Enrollments
+  /users/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Thông tin tài khoản
+          schema:
+            properties:
+              user:
+                $ref: '#/definitions/handlers.userResponse'
+            type: object
+        "401":
+          description: Chưa đăng nhập hoặc token không hợp lệ
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Không tìm thấy người dùng
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Lấy thông tin tài khoản đang đăng nhập
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: Bearer Token
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

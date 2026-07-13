@@ -20,8 +20,7 @@ var (
 	ErrCacheMiss = NewAppError("CACHE_MISS", "cache miss", http.StatusBadRequest)
 
 	ErrInvalidCredentials = NewAppError("INVALID_CREDENTIALS", "invalid credentials", http.StatusUnauthorized)
-
-	ErrInternal = NewAppError("INTERNAL_ERROR", "internal server error", http.StatusInternalServerError)
-
-	ErrForbidden = NewAppError("FORBIDDEN", "forbidden", http.StatusForbidden)
+	ErrInternal           = NewAppError("INTERNAL_ERROR", "internal server error", http.StatusInternalServerError)
+	ErrForbidden          = NewAppError("FORBIDDEN", "forbidden", http.StatusForbidden)
+	ErrRateLimitExceeded  = NewAppError("RATE_LIMIT_EXCEEDED", "rate limit exceeded", http.StatusTooManyRequests)
 )

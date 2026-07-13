@@ -40,6 +40,17 @@ type listLessonsRequest struct {
 	PerPage int `form:"per_page"`
 }
 
+// @Summary Danh sách bài học của khóa học
+// @Tags Lessons
+// @Produce json
+// @Security BearerAuth
+// @Param course_id path int true "ID khóa học"
+// @Param page_id query int false "Số trang"
+// @Param per_page query int false "Số lượng mỗi trang"
+// @Success 200 {object} object{data=[]models.Lesson} "Danh sách bài học"
+// @Failure 400 {object} response.ErrorResponse "ID khóa học không hợp lệ"
+// @Failure 401 {object} response.ErrorResponse "Chưa đăng nhập hoặc token không hợp lệ"
+// @Router /courses/{course_id}/lessons [get]
 func (h *LessonHandler) list(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
@@ -69,6 +80,17 @@ func (h *LessonHandler) list(c *gin.Context) {
 	})
 }
 
+// @Summary Tạo bài học mới
+// @Tags Lessons
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param course_id path int true "ID khóa học"
+// @Param request body lessonRequest true "Thông tin bài học"
+// @Success 201 {object} object{message=string} "Tạo bài học thành công"
+// @Failure 400 {object} response.ErrorResponse "Dữ liệu đầu vào không hợp lệ"
+// @Failure 401 {object} response.ErrorResponse "Chưa đăng nhập hoặc token không hợp lệ"
+// @Router /courses/{course_id}/lessons [post]
 func (h *LessonHandler) create(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {

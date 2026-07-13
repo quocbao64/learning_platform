@@ -1,6 +1,7 @@
 package di
 
 import (
+	_ "learning-platform/docs"
 	"learning-platform/internal/handlers"
 	"learning-platform/internal/middleware"
 	"learning-platform/internal/platform/jwt"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Container struct {
@@ -25,6 +28,7 @@ type Container struct {
 
 func (c *Container) SetupRouter() *gin.Engine {
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	api := r.Group("/api/v1")
 	authMiddleware := middleware.Auth(c.JWTManager)
 	limitByIP := middleware.RateLimit(c.RateLimit, 5, time.Minute, keyByIP)

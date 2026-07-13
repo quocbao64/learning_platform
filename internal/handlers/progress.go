@@ -26,6 +26,16 @@ func (h *ProgressHandler) RegisterRoutes(rg *gin.RouterGroup, authMW gin.Handler
 	rg.GET("/enrollments/:enrollment_id/progress", authMW, h.getProgress)
 }
 
+// @Summary Cập nhật tiến độ khóa học
+// @Tags Progress
+// @Produce json
+// @Security BearerAuth
+// @Param enrollment_id path int true "ID đăng ký khóa học"
+// @Param lesson_id path int true "ID bài học"
+// @Success 200 {object} object{message=string} "Cập nhật tiến độ thành công"
+// @Failure 400 {object} response.ErrorResponse "ID đăng ký khóa học hoặc ID bài học không hợp lệ"
+// @Failure 401 {object} response.ErrorResponse "Chưa đăng nhập hoặc token không hợp lệ"
+// @Router /enrollments/{enrollment_id}/lessons/{lesson_id}/progress [patch]
 func (h *ProgressHandler) updateProgress(c *gin.Context) {
 	enrollmentId, err := strconv.ParseInt(c.Param("enrollment_id"), 10, 64)
 	if err != nil {
@@ -54,6 +64,15 @@ func (h *ProgressHandler) updateProgress(c *gin.Context) {
 	})
 }
 
+// @Summary Xem tiến độ học tập
+// @Tags Progress
+// @Produce json
+// @Security BearerAuth
+// @Param enrollment_id path int true "ID đăng ký khóa học"
+// @Success 200 {object} object{progress=models.CourseProgress} "Tiến độ học tập"
+// @Failure 400 {object} response.ErrorResponse "ID đăng ký khóa học không hợp lệ"
+// @Failure 401 {object} response.ErrorResponse "Chưa đăng nhập hoặc token không hợp lệ"
+// @Router /enrollments/{enrollment_id}/progress [get]
 func (h *ProgressHandler) getProgress(c *gin.Context) {
 	enrollmentId, err := strconv.ParseInt(c.Param("enrollment_id"), 10, 64)
 	if err != nil {

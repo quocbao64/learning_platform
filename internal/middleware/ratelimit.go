@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"fmt"
+	"learning-platform/internal/handlers/response"
+	"learning-platform/internal/models"
 	"learning-platform/internal/platform/ratelimit"
-	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ func RateLimit(limiter *ratelimit.RateLimiter, limit int, window time.Duration, 
 		c.Header("X-RateLimit-Remaining", fmt.Sprintf("%d", remaining))
 
 		if !allowed {
-			c.AbortWithStatus(http.StatusTooManyRequests)
+			response.AbortWithError(c, models.ErrRateLimitExceeded)
 			return
 		}
 
