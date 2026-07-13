@@ -23,7 +23,9 @@ func (m *txManager) ExecTx(ctx context.Context, fn func(ctx context.Context, tx 
 	if err != nil {
 		return models.ErrInternal.Wrap(err)
 	}
-	defer tx.Rollback(ctx)
+	defer func(tx pgx.Tx, ctx context.Context) {
+		_ = tx.Rollback(ctx)
+	}(tx, ctx)
 
 	if err := fn(ctx, tx); err != nil {
 		return models.ErrInternal.Wrap(err)

@@ -34,7 +34,6 @@ func (r *courseRepository) List(c context.Context, filter *services.CourseFilter
 	if filter.Keyword != "" {
 		query += fmt.Sprintf(` AND (title ILIKE $%d OR description ILIKE $%d)`, i, i)
 		args = append(args, "%"+filter.Keyword+"%")
-		i++
 	}
 
 	query += fmt.Sprintf(` ORDER BY created_at DESC LIMIT %d OFFSET %d`, filter.PerPage, (filter.PageID)*filter.PerPage)

@@ -53,7 +53,6 @@ func (r *enrollmentRepository) List(c context.Context, filter *services.Enrollme
 	if filter.CourseID != 0 {
 		query += fmt.Sprintf(` AND course_id = $%d`, i)
 		args = append(args, filter.CourseID)
-		i++
 	}
 
 	rows, err := r.db.Query(c, query, args...)
