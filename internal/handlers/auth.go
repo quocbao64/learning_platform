@@ -37,6 +37,7 @@ type registerRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	FullName string `json:"full_name" binding:"required"`
+	Roles    string `json:"roles" binding:"required"`
 }
 
 func (h *AuthHandler) login(c *gin.Context) {
@@ -64,7 +65,7 @@ func (h *AuthHandler) register(c *gin.Context) {
 		return
 	}
 
-	_, err := h.userService.Register(c.Request.Context(), req.FullName, req.Username, req.Password)
+	_, err := h.userService.Register(c.Request.Context(), req.FullName, req.Username, req.Password, req.Roles)
 	if err != nil {
 		response.Error(c, err)
 		return

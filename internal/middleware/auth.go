@@ -10,6 +10,7 @@ import (
 )
 
 const CtxUserID = "user_id"
+const CtxRole = "role"
 
 func UserID(c *gin.Context) int64 {
 	return c.GetInt64(CtxUserID)
@@ -36,6 +37,22 @@ func Auth(jwtManager *jwt.Manager) gin.HandlerFunc {
 		}
 
 		c.Set(CtxUserID, claims.UserID)
+		c.Set(CtxRole, claims.Roles)
 		c.Next()
 	}
+}
+
+func RequireRole(roles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole := c.GetString(CtxRole)
+		for _, role := range roles {
+			if userRole == role {
+				c.Next()
+				return
+			}
+		}
+
+		response.AbortWithError(c, models.ErrForbidden)
+	}
+
 }

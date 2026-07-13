@@ -34,5 +34,5 @@ func (s *authService) Login(c context.Context, email, password string) (string, 
 		return "", models.ErrInvalidCredentials
 	}
 
-	return s.jwtManager.GenerateToken(user.ID)
+	return s.jwtManager.GenerateToken(user.ID, user.Roles)
 }

@@ -12,7 +12,8 @@ import (
 var ErrInvalidToken = errors.New("invalid token")
 
 type Claims struct {
-	UserID int64 `json:"user_id"`
+	UserID int64  `json:"user_id"`
+	Roles  string `json:"roles"`
 	jwt.RegisteredClaims
 }
 
@@ -28,11 +29,12 @@ func NewManager(secret string, ttl int) *Manager {
 	}
 }
 
-func (m *Manager) GenerateToken(userID int64) (string, error) {
+func (m *Manager) GenerateToken(userID int64, roles string) (string, error) {
 	now := time.Now()
 	exp := now.Add(m.ttl)
 	claims := Claims{
 		UserID: userID,
+		Roles:  roles,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(exp),
 			IssuedAt:  jwt.NewNumericDate(now),

@@ -15,7 +15,7 @@ type UserRepository interface {
 }
 
 type UserService interface {
-	Register(ctx context.Context, name, email, password string) (*models.User, error)
+	Register(ctx context.Context, name, email, password, roles string) (*models.User, error)
 	GetByID(ctx context.Context, id int64) (*models.User, error)
 }
 
@@ -27,13 +27,17 @@ func NewUserService(repo UserRepository) *userService {
 	return &userService{repo: repo}
 }
 
-func (s *userService) Register(ctx context.Context, name, email, password string) (*models.User, error) {
+func (s *userService) Register(ctx context.Context, name, email, password, roles string) (*models.User, error) {
 	user, err := s.repo.GetByEmail(ctx, email)
 	if err != nil && !errors.Is(err, models.ErrUserNotFound) {
 		return nil, err
 	}
 	if user != nil {
 		return nil, models.ErrEmailAlreadyExists
+	}
+
+	if !isValidRoles([]string{roles}) {
+		return nil, models.ErrInvalidRole
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -45,16 +49,31 @@ func (s *userService) Register(ctx context.Context, name, email, password string
 		FullName: name,
 		Email:    email,
 		Password: string(hash),
-		Roles:    "user",
+		Roles:    roles,
 	}
 
 	if err := s.repo.Create(ctx, user); err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return user, nil
 }
 
 func (s *userService) GetByID(ctx context.Context, id int64) (*models.User, error) {
 	return s.repo.GetByID(ctx, id)
+}
+
+func isValidRoles(roles []string) bool {
+	for _, role := range roles {
+		switch role {
+		case models.UserRoleAdmin,
+			models.UserRoleUser,
+			models.UserRoleInstructor:
+			return true
+		default:
+			return false
+		}
+	}
+
+	return false
 }

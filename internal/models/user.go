@@ -17,3 +17,9 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
+
+const (
+	UserRoleAdmin      = "admin"
+	UserRoleUser       = "user"
+	UserRoleInstructor = "instructor"
+)

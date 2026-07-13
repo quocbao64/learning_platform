@@ -22,13 +22,14 @@ func NewCourseHandler(courseService services.CourseService) *CourseHandler {
 }
 
 func (h *CourseHandler) RegisterRoute(r *gin.RouterGroup, authMW gin.HandlerFunc) {
+	instructorRoles := middleware.RequireRole(models.UserRoleInstructor, models.UserRoleAdmin)
 	courseGroup := r.Group("/courses")
 	{
-		courseGroup.POST("", authMW, h.create)
+		courseGroup.POST("", authMW, instructorRoles, h.create)
 		courseGroup.GET("", authMW, h.list)
 		courseGroup.GET("/:course_id", authMW, h.GetCourseByID)
-		courseGroup.PATCH("/:course_id", authMW, h.update)
-		courseGroup.DELETE("/:course_id", authMW, h.delete)
+		courseGroup.PATCH("/:course_id", authMW, instructorRoles, h.update)
+		courseGroup.DELETE("/:course_id", authMW, instructorRoles, h.delete)
 	}
 }
 
@@ -129,6 +130,7 @@ func (h *CourseHandler) update(c *gin.Context) {
 	var req updateCourseRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, err)
+		return
 	}
 
 	input := &models.UpdateCourse{

@@ -96,6 +96,63 @@ func (_c *MockCache_Delete_Call) RunAndReturn(run func(c context.Context, key st
 	return _c
 }
 
+// DeleteByPattern provides a mock function for the type MockCache
+func (_mock *MockCache) DeleteByPattern(ctx context.Context, pattern string) error {
+	ret := _mock.Called(ctx, pattern)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteByPattern")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = returnFunc(ctx, pattern)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCache_DeleteByPattern_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteByPattern'
+type MockCache_DeleteByPattern_Call struct {
+	*mock.Call
+}
+
+// DeleteByPattern is a helper method to define mock.On call
+//   - ctx context.Context
+//   - pattern string
+func (_e *MockCache_Expecter) DeleteByPattern(ctx any, pattern any) *MockCache_DeleteByPattern_Call {
+	return &MockCache_DeleteByPattern_Call{Call: _e.mock.On("DeleteByPattern", ctx, pattern)}
+}
+
+func (_c *MockCache_DeleteByPattern_Call) Run(run func(ctx context.Context, pattern string)) *MockCache_DeleteByPattern_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCache_DeleteByPattern_Call) Return(err error) *MockCache_DeleteByPattern_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCache_DeleteByPattern_Call) RunAndReturn(run func(ctx context.Context, pattern string) error) *MockCache_DeleteByPattern_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Get provides a mock function for the type MockCache
 func (_mock *MockCache) Get(c context.Context, key string) (string, error) {
 	ret := _mock.Called(c, key)
@@ -447,6 +504,63 @@ func (_c *MockCourseRepository_DecrementSeatsTx_Call) RunAndReturn(run func(c co
 	return _c
 }
 
+// Delete provides a mock function for the type MockCourseRepository
+func (_mock *MockCourseRepository) Delete(c context.Context, id int64) error {
+	ret := _mock.Called(c, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = returnFunc(c, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCourseRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockCourseRepository_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - c context.Context
+//   - id int64
+func (_e *MockCourseRepository_Expecter) Delete(c any, id any) *MockCourseRepository_Delete_Call {
+	return &MockCourseRepository_Delete_Call{Call: _e.mock.On("Delete", c, id)}
+}
+
+func (_c *MockCourseRepository_Delete_Call) Run(run func(c context.Context, id int64)) *MockCourseRepository_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int64
+		if args[1] != nil {
+			arg1 = args[1].(int64)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCourseRepository_Delete_Call) Return(err error) *MockCourseRepository_Delete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCourseRepository_Delete_Call) RunAndReturn(run func(c context.Context, id int64) error) *MockCourseRepository_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetByID provides a mock function for the type MockCourseRepository
 func (_mock *MockCourseRepository) GetByID(c context.Context, id int64) (*models.Course, error) {
 	ret := _mock.Called(c, id)
@@ -723,6 +837,63 @@ func (_c *MockCourseRepository_List_Call) RunAndReturn(run func(c context.Contex
 	return _c
 }
 
+// Update provides a mock function for the type MockCourseRepository
+func (_mock *MockCourseRepository) Update(c context.Context, course *models.Course) error {
+	ret := _mock.Called(c, course)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Course) error); ok {
+		r0 = returnFunc(c, course)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockCourseRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type MockCourseRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - c context.Context
+//   - course *models.Course
+func (_e *MockCourseRepository_Expecter) Update(c any, course any) *MockCourseRepository_Update_Call {
+	return &MockCourseRepository_Update_Call{Call: _e.mock.On("Update", c, course)}
+}
+
+func (_c *MockCourseRepository_Update_Call) Run(run func(c context.Context, course *models.Course)) *MockCourseRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *models.Course
+		if args[1] != nil {
+			arg1 = args[1].(*models.Course)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCourseRepository_Update_Call) Return(err error) *MockCourseRepository_Update_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockCourseRepository_Update_Call) RunAndReturn(run func(c context.Context, course *models.Course) error) *MockCourseRepository_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockEnrollmentRepository creates a new instance of MockEnrollmentRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockEnrollmentRepository(t interface {
@@ -748,6 +919,72 @@ type MockEnrollmentRepository_Expecter struct {
 
 func (_m *MockEnrollmentRepository) EXPECT() *MockEnrollmentRepository_Expecter {
 	return &MockEnrollmentRepository_Expecter{mock: &_m.Mock}
+}
+
+// CountByCourseID provides a mock function for the type MockEnrollmentRepository
+func (_mock *MockEnrollmentRepository) CountByCourseID(c context.Context, courseID int64) (int64, error) {
+	ret := _mock.Called(c, courseID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CountByCourseID")
+	}
+
+	var r0 int64
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int64) (int64, error)); ok {
+		return returnFunc(c, courseID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int64) int64); ok {
+		r0 = returnFunc(c, courseID)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = returnFunc(c, courseID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockEnrollmentRepository_CountByCourseID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountByCourseID'
+type MockEnrollmentRepository_CountByCourseID_Call struct {
+	*mock.Call
+}
+
+// CountByCourseID is a helper method to define mock.On call
+//   - c context.Context
+//   - courseID int64
+func (_e *MockEnrollmentRepository_Expecter) CountByCourseID(c any, courseID any) *MockEnrollmentRepository_CountByCourseID_Call {
+	return &MockEnrollmentRepository_CountByCourseID_Call{Call: _e.mock.On("CountByCourseID", c, courseID)}
+}
+
+func (_c *MockEnrollmentRepository_CountByCourseID_Call) Run(run func(c context.Context, courseID int64)) *MockEnrollmentRepository_CountByCourseID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int64
+		if args[1] != nil {
+			arg1 = args[1].(int64)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockEnrollmentRepository_CountByCourseID_Call) Return(n int64, err error) *MockEnrollmentRepository_CountByCourseID_Call {
+	_c.Call.Return(n, err)
+	return _c
+}
+
+func (_c *MockEnrollmentRepository_CountByCourseID_Call) RunAndReturn(run func(c context.Context, courseID int64) (int64, error)) *MockEnrollmentRepository_CountByCourseID_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // Create provides a mock function for the type MockEnrollmentRepository

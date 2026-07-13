@@ -15,6 +15,7 @@ var (
 
 	ErrUserNotFound       = NewAppError("USER_NOT_FOUND", "user not found", http.StatusBadRequest)
 	ErrEmailAlreadyExists = NewAppError("EMAIL_ALREADY_EXISTS", "email already exists", http.StatusBadRequest)
+	ErrInvalidRole        = NewAppError("INVALID_ROLE", "invalid role", http.StatusBadRequest)
 
 	ErrCacheMiss = NewAppError("CACHE_MISS", "cache miss", http.StatusBadRequest)
 

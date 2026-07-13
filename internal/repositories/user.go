@@ -21,8 +21,8 @@ func NewUserRepository(db *pgxpool.Pool) *userRepository {
 func (r *userRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
 	user := &models.User{}
 	err := r.db.QueryRow(ctx,
-		`SELECT id, email, password FROM users WHERE email = $1`, email,
-	).Scan(&user.ID, &user.Email, &user.Password)
+		`SELECT id, email, password, roles FROM users WHERE email = $1`, email,
+	).Scan(&user.ID, &user.Email, &user.Password, &user.Roles)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, models.ErrUserNotFound
