@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"learning-platform/internal/handlers/response"
 	"learning-platform/internal/models"
 	"learning-platform/internal/services"
 	"net/http"
@@ -42,13 +43,13 @@ type listLessonsRequest struct {
 func (h *LessonHandler) list(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
 	var req listLessonsRequest
 	if err := c.ShouldBindQuery(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -59,7 +60,7 @@ func (h *LessonHandler) list(c *gin.Context) {
 	}
 	courses, err := h.lessonService.List(c.Request.Context(), &filter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -71,13 +72,13 @@ func (h *LessonHandler) list(c *gin.Context) {
 func (h *LessonHandler) create(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
 	var req lessonRequest
 	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -91,7 +92,7 @@ func (h *LessonHandler) create(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 

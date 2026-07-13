@@ -40,12 +40,12 @@ func Initialize() (*Container, error) {
 		return nil, err
 	}
 	redisCache := repositories.NewRedisCache(client, config)
-	courseService := services.NewCourseService(courseRepository, redisCache)
+	enrollmentRepository := repositories.NewEnrollmentRepository(pool)
+	courseService := services.NewCourseService(courseRepository, redisCache, enrollmentRepository)
 	courseHandler := handlers.NewCourseHandler(courseService)
 	lessonRepository := repositories.NewLessonRepository(pool)
 	lessonService := services.NewLessonService(lessonRepository)
 	lessonHandler := handlers.NewLessonHandler(lessonService)
-	enrollmentRepository := repositories.NewEnrollmentRepository(pool)
 	txManager := repositories.NewTxManager(pool)
 	enrollmentService := services.NewEnrollmentService(enrollmentRepository, courseRepository, txManager, redisCache)
 	enrollmentHandler := handlers.NewEnrollmentHandler(enrollmentService)

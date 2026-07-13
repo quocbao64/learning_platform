@@ -31,13 +31,13 @@ func (r *lessonRepository) List(c context.Context, filter *services.LessonFilter
 
 	rows, err := r.db.Query(c, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 	defer rows.Close()
 
 	lessons, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[models.Lesson])
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return lessons, nil

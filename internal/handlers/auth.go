@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"learning-platform/internal/handlers/response"
 	"learning-platform/internal/services"
 	"net/http"
 
@@ -41,13 +42,13 @@ type registerRequest struct {
 func (h *AuthHandler) login(c *gin.Context) {
 	var req loginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		response.Error(c, err)
 		return
 	}
 
 	token, err := h.authService.Login(c.Request.Context(), req.Username, req.Password)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -59,13 +60,13 @@ func (h *AuthHandler) login(c *gin.Context) {
 func (h *AuthHandler) register(c *gin.Context) {
 	var req registerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		response.Error(c, err)
 		return
 	}
 
 	_, err := h.userService.Register(c.Request.Context(), req.FullName, req.Username, req.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 

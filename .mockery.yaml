@@ -1,0 +1,7 @@
+packages:
+  learning-platform/internal/services:
+    interfaces:
+      Cache:
+      TxManager:
+      CourseRepository:
+      EnrollmentRepository:

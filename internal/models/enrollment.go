@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"time"
 )
 
@@ -16,11 +15,6 @@ type Enrollment struct {
 func (e Enrollment) TableName() string {
 	return "enrollments"
 }
-
-var (
-	ErrEnrollmentAlreadyExists = errors.New("enrollment already exists")
-	ErrEnrollmentNotFound      = errors.New("enrollment not found")
-)
 
 var (
 	EnrollmentStatusActive    = "active"

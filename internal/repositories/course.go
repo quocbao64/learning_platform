@@ -42,13 +42,13 @@ func (r *courseRepository) List(c context.Context, filter *services.CourseFilter
 	rows, err := r.db.Query(c, query, args...)
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 	defer rows.Close()
 
 	courses, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[models.Course])
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return courses, nil
@@ -67,7 +67,7 @@ func (r *courseRepository) Create(c context.Context, course *models.Course) erro
 	}
 
 	if err != nil {
-		return err
+		return models.ErrInternal.Wrap(err)
 	}
 
 	return nil
@@ -95,7 +95,7 @@ func (r *courseRepository) GetByID(c context.Context, id int64) (*models.Course,
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	lessonsRows, err := r.db.Query(c,
@@ -103,7 +103,7 @@ func (r *courseRepository) GetByID(c context.Context, id int64) (*models.Course,
 				FROM lessons
     			WHERE course_id = $1 ORDER BY order_index`, id)
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	defer lessonsRows.Close()
@@ -113,7 +113,7 @@ func (r *courseRepository) GetByID(c context.Context, id int64) (*models.Course,
 		lesson := models.Lesson{}
 		err = lessonsRows.Scan(&lesson.ID, &lesson.Title, &lesson.OrderIndex, &lesson.CreatedAt, &lesson.UpdatedAt)
 		if err != nil {
-			return nil, err
+			return nil, models.ErrInternal.Wrap(err)
 		}
 		lessons = append(lessons, &lesson)
 	}
@@ -129,7 +129,7 @@ func (r *courseRepository) DecrementSeats(c context.Context, courseID int64) (bo
                WHERE id = $1 AND total_seats > 0 RETURNING total_seats`, courseID)
 
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return false, err
+		return false, models.ErrInternal.Wrap(err)
 	}
 
 	return cmd.RowsAffected() == 1, nil
@@ -143,7 +143,7 @@ func (r *courseRepository) GetSeatsByIDs(c context.Context, courseIDs []int64) (
 	rows, err := r.db.Query(c,
 		`SELECT id, total_seats FROM courses WHERE id = ANY($1)`, courseIDs)
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 	defer rows.Close()
 
@@ -152,7 +152,7 @@ func (r *courseRepository) GetSeatsByIDs(c context.Context, courseIDs []int64) (
 		var id int64
 		var totalSeats int
 		if err = rows.Scan(&id, &totalSeats); err != nil {
-			return nil, err
+			return nil, models.ErrInternal.Wrap(err)
 		}
 
 		result[id] = totalSeats
@@ -183,6 +183,29 @@ func (r *courseRepository) IncrementSeatsTx(c context.Context, tx pgx.Tx, course
 	}
 
 	return cmd.RowsAffected() == 1, nil
+}
+
+func (r *courseRepository) Update(c context.Context, course *models.Course) error {
+	err := r.db.QueryRow(c,
+		`UPDATE courses SET title = $1, description = $2, status = $3, total_seats = $4, updated_at = $5
+				WHERE id = $6 RETURNING id`,
+		course.Title, course.Description, course.Status, course.TotalSeats, time.Now(), course.ID,
+	).Scan(&course.ID)
+
+	if err != nil {
+		return models.ErrInternal.Wrap(err)
+	}
+
+	return nil
+}
+
+func (r *courseRepository) Delete(c context.Context, id int64) error {
+	err := r.db.QueryRow(c, `DELETE FROM courses WHERE id = $1`, id).Scan()
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return models.ErrInternal.Wrap(err)
+	}
+
+	return nil
 }
 
 func NewCourseRepository(db *pgxpool.Pool) *courseRepository {

@@ -2,13 +2,11 @@ package services
 
 import (
 	"context"
-	"errors"
+	"learning-platform/internal/models"
 	"learning-platform/internal/platform/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )
-
-var ErrInvalidCredentials = errors.New("invalid credentials")
 
 type AuthService interface {
 	Login(c context.Context, email, password string) (string, error)
@@ -29,11 +27,11 @@ func NewAuthService(users UserRepository, jwtManager *jwt.Manager) *authService 
 func (s *authService) Login(c context.Context, email, password string) (string, error) {
 	user, err := s.users.GetByEmail(c, email)
 	if err != nil || user == nil {
-		return "", ErrInvalidCredentials
+		return "", models.ErrInvalidCredentials
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
-		return "", ErrInvalidCredentials
+		return "", models.ErrInvalidCredentials
 	}
 
 	return s.jwtManager.GenerateToken(user.ID)

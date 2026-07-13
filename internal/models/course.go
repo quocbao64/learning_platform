@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"time"
 )
 
@@ -23,13 +22,6 @@ func (course *Course) TableName() string {
 }
 
 var (
-	ErrCourseAlreadyExists = errors.New("course already exists")
-	ErrCourseNotFound      = errors.New("course not found")
-	ErrCourseNotPublished  = errors.New("course not published")
-	ErrCourseFull          = errors.New("course full")
-)
-
-var (
 	CourseStatusDraft     = "draft"
 	CourseStatusPublished = "published"
 	CourseStatusArchived  = "archived"
@@ -43,4 +35,11 @@ type CachedCourse struct {
 	Status       string     `db:"status" json:"status"`
 	CreatedAt    *time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    *time.Time `db:"updated_at" json:"updated_at"`
+}
+
+type UpdateCourse struct {
+	Title       *string
+	Description *string
+	Status      *string
+	TotalSeats  *int
 }

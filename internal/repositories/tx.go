@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"learning-platform/internal/models"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,12 +21,12 @@ func NewTxManager(db *pgxpool.Pool) *txManager {
 func (m *txManager) ExecTx(ctx context.Context, fn func(ctx context.Context, tx pgx.Tx) error) error {
 	tx, err := m.db.Begin(ctx)
 	if err != nil {
-		return err
+		return models.ErrInternal.Wrap(err)
 	}
 	defer tx.Rollback(ctx)
 
 	if err := fn(ctx, tx); err != nil {
-		return err
+		return models.ErrInternal.Wrap(err)
 	}
 
 	return tx.Commit(ctx)

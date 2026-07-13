@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"learning-platform/internal/handlers/response"
 	"learning-platform/internal/middleware"
 	"learning-platform/internal/models"
 	"learning-platform/internal/services"
@@ -28,13 +29,13 @@ func (h *ProgressHandler) RegisterRoutes(rg *gin.RouterGroup, authMW gin.Handler
 func (h *ProgressHandler) updateProgress(c *gin.Context) {
 	enrollmentId, err := strconv.ParseInt(c.Param("enrollment_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
 	lessonId, err := strconv.ParseInt(c.Param("lesson_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -44,7 +45,7 @@ func (h *ProgressHandler) updateProgress(c *gin.Context) {
 		Status:       models.ProgressStatusCompleted,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -56,7 +57,7 @@ func (h *ProgressHandler) updateProgress(c *gin.Context) {
 func (h *ProgressHandler) getProgress(c *gin.Context) {
 	enrollmentId, err := strconv.ParseInt(c.Param("enrollment_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -64,7 +65,7 @@ func (h *ProgressHandler) getProgress(c *gin.Context) {
 
 	progress, err := h.progressService.GetProgress(c, userID, enrollmentId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 

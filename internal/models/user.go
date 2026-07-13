@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"time"
 )
 
@@ -18,8 +17,3 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
-
-var (
-	ErrUserNotFound       = errors.New("user not found")
-	ErrEmailAlreadyExists = errors.New("email already exists")
-)

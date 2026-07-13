@@ -22,6 +22,7 @@ type EnrollmentRepository interface {
 	FindByID(c context.Context, id int64) (*models.Enrollment, error)
 	CreateTx(c context.Context, tx pgx.Tx, enrollment *models.Enrollment) (*models.Enrollment, error)
 	DeleteTx(c context.Context, tx pgx.Tx, id int64) error
+	CountByCourseID(c context.Context, courseID int64) (int64, error)
 }
 
 type EnrollmentService interface {

@@ -16,7 +16,7 @@ services:
         image: postgres:latest
         container_name: postgres
         ports:
-            - "5432:5432"
+            - "5433:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
         environment:
@@ -24,7 +24,7 @@ services:
         env_file:
           - /etc/learning_platform/prod.db.env
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -dd ${DB_NAME}"]
+          test: [ "CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\"" ]
           interval: 10s
           timeout: 5s
           retries: 1
@@ -41,6 +41,13 @@ services:
           interval: 10s
           timeout: 5s
           retries: 1
+        networks:
+            - default
+    redis-insight:
+        image: redislabs/redisinsight:latest
+        container_name: redisinsight
+        ports:
+            - "8001:5540"
         networks:
             - default
 volumes:

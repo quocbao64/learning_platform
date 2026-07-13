@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"learning-platform/internal/handlers/response"
 	"learning-platform/internal/middleware"
 	"learning-platform/internal/models"
 	"learning-platform/internal/services"
@@ -30,7 +31,7 @@ func (h *EnrollmentHandler) RegisterRoutes(router *gin.RouterGroup, authMW gin.H
 func (h *EnrollmentHandler) enroll(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -44,7 +45,7 @@ func (h *EnrollmentHandler) enroll(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -61,7 +62,7 @@ func (h *EnrollmentHandler) listEnrollments(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -73,7 +74,7 @@ func (h *EnrollmentHandler) listEnrollments(c *gin.Context) {
 func (h *EnrollmentHandler) cancel(c *gin.Context) {
 	courseID, err := strconv.ParseInt(c.Param("course_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 
@@ -81,7 +82,7 @@ func (h *EnrollmentHandler) cancel(c *gin.Context) {
 
 	err = h.enrollmentService.DeleteEnrollment(c.Request.Context(), userID, courseID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 

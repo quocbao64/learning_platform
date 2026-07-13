@@ -32,7 +32,7 @@ func (r *enrollmentRepository) Create(c context.Context, enrollment *models.Enro
 	).Scan(&enrollment.ID)
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return enrollment, nil
@@ -58,14 +58,14 @@ func (r *enrollmentRepository) List(c context.Context, filter *services.Enrollme
 
 	rows, err := r.db.Query(c, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	defer rows.Close()
 
 	enrollments, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[models.Enrollment])
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return enrollments, nil
@@ -99,7 +99,7 @@ func (r *enrollmentRepository) FindByUserIDAndCourseID(c context.Context, userID
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return &enrollment, nil
@@ -124,7 +124,7 @@ func (r *enrollmentRepository) FindByID(c context.Context, id int64) (*models.En
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return &enrollment, nil
@@ -141,7 +141,7 @@ func (r *enrollmentRepository) CreateTx(c context.Context, tx pgx.Tx, enrollment
 	).Scan(&enrollment.ID)
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return enrollment, nil
@@ -154,4 +154,17 @@ func (r *enrollmentRepository) DeleteTx(c context.Context, tx pgx.Tx, id int64) 
 	}
 
 	return nil
+}
+
+func (r *enrollmentRepository) CountByCourseID(c context.Context, courseID int64) (int64, error) {
+	var count int64
+	err := r.db.QueryRow(c,
+		`SELECT count(*) FROM enrollments WHERE course_id = $1`, courseID,
+	).Scan(&count)
+
+	if err != nil {
+		return 0, models.ErrInternal.Wrap(err)
+	}
+
+	return count, nil
 }

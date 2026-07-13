@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"learning-platform/internal/handlers/response"
 	"learning-platform/internal/middleware"
 	"learning-platform/internal/models"
 	"learning-platform/internal/services"
@@ -45,7 +46,7 @@ func toUserResponse(user *models.User) *userResponse {
 func (h *UserHandler) getCurrentUser(c *gin.Context) {
 	user, err := h.userService.GetByID(c.Request.Context(), middleware.UserID(c))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, err)
 		return
 	}
 

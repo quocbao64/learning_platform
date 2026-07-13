@@ -29,7 +29,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*models.
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return user, nil
@@ -61,7 +61,7 @@ func (r *userRepository) GetByID(ctx context.Context, id int64) (*models.User, e
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return user, nil

@@ -37,7 +37,7 @@ func (r *progressRepository) Upsert(c context.Context, progress *models.Progress
 	).Scan(&progress.ID)
 
 	if err != nil {
-		return nil, err
+		return nil, models.ErrInternal.Wrap(err)
 	}
 
 	return progress, nil
